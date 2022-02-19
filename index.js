@@ -9,7 +9,7 @@ app.use(express.json())
 
 //GET
 app.get('/', function (req, res) {
-  res.status(200).json({ message: 'foi' })
+  res.status(200).json({ message: 'foi' }) 
 })
 
 //POST
@@ -37,4 +37,9 @@ app.post('/test', (req, res) => {
       return res.json(project)
     })
   }
+})
+//DELET
+app.delete('/:id', (req, res)=>{
+  const id = req.params.id
+  res.status(200).json({ message: 'deletado'+id})
 })
