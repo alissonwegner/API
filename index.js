@@ -1,19 +1,40 @@
 const express = require('express')
-//const db = require('./db')
-const { MongoClient } = require('mongodb')
+const { MongoClient, ObjectId } = require('mongodb')
 const app = express()
 const port = 3000
-
+//const db = require("../db")
 app.listen(port, () => console.log('App running on port ' + port))
 app.use(express.json())
 
 //GET
-app.get('/', function (req, res) {
-  res.status(200).json({ message: 'foi' }) 
+app.get('/get', function (req, res) {
+  const client = new MongoClient('mongodb://localhost:27017/', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
+  let db
+  let teste
+  let resposta
+  client.connect(() => {
+    db = client.db('teste') //banco
+    teste = db.collection('teste') //tabela
+     lista()
+    
+  })
+  lista = () =>{
+
+    teste.find({}).toArray(function(err, result) {
+      if (err)  return res.json({err});
+      //console.log(result);
+      return res.json({result})
+    }); 
+  }
+ 
+   
 })
 
 //POST
-app.post('/test', (req, res) => {
+app.post('/teste', (req, res) => {
   const client = new MongoClient('mongodb://localhost:27017/', {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -40,6 +61,27 @@ app.post('/test', (req, res) => {
 })
 //DELET
 app.delete('/:id', (req, res)=>{
-  const id = req.params.id
-  res.status(200).json({ message: 'deletado'+id})
-})
+    const client = new MongoClient('mongodb://localhost:27017/', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
+  let db
+  let teste
+  client.connect(async()=> {
+    db = client.db('teste') //banco
+    teste = db.collection('teste') //tabela
+    deleta()
+ 
+
+  })
+  deleta = async() => {
+    const ide = req.params.id
+   const Object = ObjectId
+    const retorno = await teste.deleteOne ({_id: new ObjectID(ide)});
+    console.log(retorno)
+    res.status(200).json({ message: 'deletado' +ide})
+    //teste.deleteOne(id);
+  };
+  //const id = req.params.id
+  //res.status(200).json({ message: 'deletado' +id})
+}) 
