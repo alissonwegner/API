@@ -25,7 +25,6 @@ app.get('/get', function (req, res) {
 
     teste.find({}).toArray(function(err, result) {
       if (err)  return res.json({err});
-      //console.log(result);
       return res.json({result})
     }); 
   }
@@ -51,7 +50,8 @@ app.post('/teste', (req, res) => {
     const project = {
       id,
       tarefa,
-      descricao
+      descricao,
+      tempo_trabalhado
     }
     teste.insertOne(project, err => {
       if (err) return res.json({ mensagem: err })
@@ -77,11 +77,68 @@ app.delete('/:id', (req, res)=>{
   deleta = async() => {
     const ide = req.params.id
    const Object = ObjectId
-    const retorno = await teste.deleteOne ({_id: new ObjectID(ide)});
+    const retorno = await teste.deleteOne ({_id: new Object(ide)});
     console.log(retorno)
-    res.status(200).json({ message: 'deletado' +ide})
-    //teste.deleteOne(id);
+    res.status(200).json({ message: 'deletado ' +ide})
   };
-  //const id = req.params.id
-  //res.status(200).json({ message: 'deletado' +id})
+
 }) 
+//PATCH
+app.patch('/patch', (req, res) => {
+  const client = new MongoClient('mongodb://localhost:27017/', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
+  let db
+  let teste
+  client.connect(() => {
+    db = client.db('teste') //banco
+    teste = db.collection('teste') //tabela
+    atualiza()
+  })
+  atualiza = () => {
+    const { id, tarefa, descricao } = req.body
+    const project = {
+      id,
+      tarefa,
+      descricao
+      
+    }
+    teste.updateOne({id: project.id},{ $set: {tarefa: project.tarefa, descricao: project.descricao}}
+
+    )
+    return res.json(project)
+  }
+})
+//TEMPO TRABALHADO 
+app.patch('/data', (req, res) => {
+  const client = new MongoClient('mongodb://localhost:27017/', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
+  let db
+  let teste
+  client.connect(() => {
+    db = client.db('teste') //banco
+    teste = db.collection('teste') //tabela
+    addtime()
+  })
+  addtime = () => {
+    const { id, tarefa, descricao } = req.body
+    const project = {
+      id,
+      tarefa,
+      descricao
+    }
+    teste.find({}).toArray(function(err, result) {
+      if (err)  return res.json({err});
+      return res.json({result})
+      }); 
+      if(res.tempo_trabalhado === 'undefined'){
+        teste.updateOne({id: project.id},{ $set: {tempo_trabalhado: 1 }})
+      }
+
+    
+    return res.json(project)
+  }
+})
