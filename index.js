@@ -2,6 +2,8 @@ const express = require('express')
 const { MongoClient, ObjectId } = require('mongodb')
 const app = express()
 const port = 3000
+var dayjs = require('dayjs') 
+//const  = require('./Conect')
 //const db = require("../db")
 app.listen(port, () => console.log('App running on port ' + port))
 app.use(express.json())
@@ -50,12 +52,16 @@ app.post('/teste', (req, res) => {
     const project = {
       id,
       tarefa,
-      descricao,
-      tempo_trabalhado
+      descricao
+      
     }
+    project.horario_inicio = dayjs().format('HH:mm:ss')
+    project.tempo_trabalhado = 0;
+    console.log(dayjs().format('HH:mm:ss'))
     teste.insertOne(project, err => {
       if (err) return res.json({ mensagem: err })
       return res.json(project)
+    
     })
   }
 })
@@ -110,7 +116,7 @@ app.patch('/patch', (req, res) => {
     return res.json(project)
   }
 })
-//TEMPO TRABALHADO 
+//TEMPO TRABALHADO iniciado
 app.patch('/data', (req, res) => {
   const client = new MongoClient('mongodb://localhost:27017/', {
     useNewUrlParser: true,
@@ -130,14 +136,10 @@ app.patch('/data', (req, res) => {
       tarefa,
       descricao
     }
-    teste.find({}).toArray(function(err, result) {
-      if (err)  return res.json({err});
-      return res.json({result})
-      }); 
-      if(res.tempo_trabalhado === 'undefined'){
-        teste.updateOne({id: project.id},{ $set: {tempo_trabalhado: 1 }})
-      }
+    project.horario_inicio = dayjs().format('HH:mm:ss')
+    teste.updateOne({id: project.id},{ $set: {horario_inicio: project.horario_inicio}})
 
+     
     
     return res.json(project)
   }
