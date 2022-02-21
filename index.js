@@ -165,24 +165,20 @@ app.patch('/stop', (req, res) => {
       tarefa,
       descricao
     }
-    var tare = teste.find({ id: project.id }).toArray(function (err, result) {
-      if (err) return res.json({ err });
-      return res.json({ result })
-  });
-  
     let time = dayjs()
     time = new Date(time).valueOf()
+    let time2 = teste.findOne({ id: project.id}, function(err, result) {
+      if (err) throw err;
+      return result
+    })
 
-    console.log(tare.horario_inicio)
-
-   var time2 = new Date(time2).valueOf()
-    
-   time = time - time2
     console.log(time2)
+    time2 = new Date(time2).valueOf()
+   time = time - time2
     project.tempo_trabalhado = dayjs(time).format('hh:mm:ss')
     
-    let variavel = res.tempo_trabalhado + project.tempo_trabalhado
-    teste.updateOne({ id: project.id }, { $set: { tempo_trabalhado:  project.tempo_trabalhado } })
+    let variavel = time + time2
+    teste.updateOne({ id: project.id }, { $set: { tempo_trabalhado:  variavel } })
     return res.json(project)
   }
 })
