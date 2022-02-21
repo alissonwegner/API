@@ -2,7 +2,7 @@ const express = require('express')
 const { MongoClient, ObjectId } = require('mongodb')
 const app = express()
 const port = 3000
-var dayjs = require('dayjs') 
+var dayjs = require('dayjs')
 //const  = require('./Conect')
 //const db = require("../db")
 app.listen(port, () => console.log('App running on port ' + port))
@@ -20,18 +20,18 @@ app.get('/get', function (req, res) {
   client.connect(() => {
     db = client.db('teste') //banco
     teste = db.collection('teste') //tabela
-     lista()
-    
-  })
-  lista = () =>{
+    lista()
 
-    teste.find({}).toArray(function(err, result) {
-      if (err)  return res.json({err});
-      return res.json({result})
-    }); 
+  })
+  lista = () => {
+
+    teste.find({}).toArray(function (err, result) {
+      if (err) return res.json({ err });
+      return res.json({ result })
+    });
   }
- 
-   
+
+
 })
 
 //POST
@@ -53,42 +53,41 @@ app.post('/teste', (req, res) => {
       id,
       tarefa,
       descricao
-      
+
     }
-    project.horario_inicio = dayjs().format('HH:mm:ss')
-    project.tempo_trabalhado = 0;
-    console.log(dayjs().format('HH:mm:ss'))
+    project.horario_inicio = dayjs().format()
+    
     teste.insertOne(project, err => {
       if (err) return res.json({ mensagem: err })
       return res.json(project)
-    
+
     })
   }
 })
 //DELET
-app.delete('/:id', (req, res)=>{
-    const client = new MongoClient('mongodb://localhost:27017/', {
+app.delete('/:id', (req, res) => {
+  const client = new MongoClient('mongodb://localhost:27017/', {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
   let db
   let teste
-  client.connect(async()=> {
+  client.connect(async () => {
     db = client.db('teste') //banco
     teste = db.collection('teste') //tabela
     deleta()
- 
+
 
   })
-  deleta = async() => {
+  deleta = async () => {
     const ide = req.params.id
-   const Object = ObjectId
-    const retorno = await teste.deleteOne ({_id: new Object(ide)});
+    const Object = ObjectId
+    const retorno = await teste.deleteOne({ _id: new Object(ide) });
     console.log(retorno)
-    res.status(200).json({ message: 'deletado ' +ide})
+    res.status(200).json({ message: 'deletado ' + ide })
   };
 
-}) 
+})
 //PATCH
 app.patch('/patch', (req, res) => {
   const client = new MongoClient('mongodb://localhost:27017/', {
@@ -108,9 +107,9 @@ app.patch('/patch', (req, res) => {
       id,
       tarefa,
       descricao
-      
+
     }
-    teste.updateOne({id: project.id},{ $set: {tarefa: project.tarefa, descricao: project.descricao}}
+    teste.updateOne({ id: project.id }, { $set: { tarefa: project.tarefa, descricao: project.descricao } }
 
     )
     return res.json(project)
@@ -136,11 +135,11 @@ app.patch('/data', (req, res) => {
       tarefa,
       descricao
     }
-    project.horario_inicio = dayjs().format('HH:mm:ss')
-    teste.updateOne({id: project.id},{ $set: {horario_inicio: project.horario_inicio}})
+    project.horario_inicio = dayjs().format()
+    teste.updateOne({ id: project.id }, { $set: { horario_inicio: project.horario_inicio, tempo_trabalhado: '00:00:00' } })
 
-     
-    
+
+
     return res.json(project)
   }
 })
@@ -166,19 +165,24 @@ app.patch('/stop', (req, res) => {
       tarefa,
       descricao
     }
+    var tare = teste.find({ id: project.id }).toArray(function (err, result) {
+      if (err) return res.json({ err });
+      return res.json({ result })
+  });
+  
     let time = dayjs()
     time = new Date(time).valueOf()
-    
-    teste.find({id: project.id}).toArray(function(err, result) {
-      if (err)  return res.json({err});
-      
-    });
-    let time2 = new Date(res.horario_inicio).valueOf()
 
-     time= time2- time
-     project.tempo_trabalhado = time
+    console.log(tare.horario_inicio)
+
+   var time2 = new Date(time2).valueOf()
+    
+   time = time - time2
+    console.log(time2)
+    project.tempo_trabalhado = dayjs(time).format('hh:mm:ss')
+    
     let variavel = res.tempo_trabalhado + project.tempo_trabalhado
-    teste.updateOne({},{ $set: {horario_inicio: project.horario_inicio, tempo_trabalhado: variavel}}) 
+    teste.updateOne({ id: project.id }, { $set: { tempo_trabalhado:  project.tempo_trabalhado } })
     return res.json(project)
   }
 })
