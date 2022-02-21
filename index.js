@@ -144,3 +144,41 @@ app.patch('/data', (req, res) => {
     return res.json(project)
   }
 })
+
+
+//TEMPO TRABALHADO parar
+app.patch('/stop', (req, res) => {
+  const client = new MongoClient('mongodb://localhost:27017/', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
+  let db
+  let teste
+  client.connect(() => {
+    db = client.db('teste') //banco
+    teste = db.collection('teste') //tabela
+    timestop()
+  })
+  timestop = () => {
+    const { id, tarefa, descricao } = req.body
+    const project = {
+      id,
+      tarefa,
+      descricao
+    }
+    let time = dayjs()
+    time = new Date(time).valueOf()
+    
+    teste.find({id: project.id}).toArray(function(err, result) {
+      if (err)  return res.json({err});
+      
+    });
+    let time2 = new Date(res.horario_inicio).valueOf()
+
+     time= time2- time
+     project.tempo_trabalhado = time
+    let variavel = res.tempo_trabalhado + project.tempo_trabalhado
+    teste.updateOne({},{ $set: {horario_inicio: project.horario_inicio, tempo_trabalhado: variavel}}) 
+    return res.json(project)
+  }
+})
